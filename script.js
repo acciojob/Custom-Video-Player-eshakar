@@ -1,4 +1,4 @@
-/* Get Elements */
+/* Edit this file */
 const player = document.querySelector('.player');
 const video = player.querySelector('.viewer');
 const progress = player.querySelector('.progress');
@@ -6,10 +6,8 @@ const progressBar = player.querySelector('.progress__filled');
 const toggle = player.querySelector('.toggle');
 const skipButtons = player.querySelectorAll('[data-skip]');
 const ranges = player.querySelectorAll('.player__slider');
-const speedValue = player.querySelector('.speed-value');
-const rewindButton = player.querySelector('.rewind'); // Add reference to rewind button
 
-/* Build functions */
+/* Functions */
 function togglePlay() {
   if (video.paused) {
     video.play();
@@ -27,18 +25,8 @@ function skip() {
   video.currentTime += parseFloat(this.dataset.skip);
 }
 
-function rewind() {
-  // Rewind the video by 10 seconds
-  video.currentTime = Math.max(0, video.currentTime - 10);
-}
-
 function handleRangeUpdate() {
-  if (this.name === 'volume') {
-    video[this.name] = this.value;
-  } else if (this.name === 'playbackSpeed') {
-    video.playbackRate = this.value;
-    speedValue.textContent = `${this.value}x`;
-  }
+  video[this.name] = this.value;
 }
 
 function handleProgress() {
@@ -58,14 +46,7 @@ video.addEventListener('pause', updateButton);
 video.addEventListener('timeupdate', handleProgress);
 
 toggle.addEventListener('click', togglePlay);
-
 skipButtons.forEach(button => button.addEventListener('click', skip));
-
-// Add event listener for the rewind button
-if (rewindButton) {
-  rewindButton.addEventListener('click', rewind);
-}
-
 ranges.forEach(range => range.addEventListener('change', handleRangeUpdate));
 ranges.forEach(range => range.addEventListener('mousemove', handleRangeUpdate));
 
@@ -74,3 +55,10 @@ progress.addEventListener('click', scrub);
 progress.addEventListener('mousemove', (e) => mousedown && scrub(e));
 progress.addEventListener('mousedown', () => mousedown = true);
 progress.addEventListener('mouseup', () => mousedown = false);
+progress.addEventListener('mouseout', () => mousedown = false);
+
+// Handle potential video loading errors
+video.addEventListener('error', function() {
+  console.error('Error loading video');
+  player.innerHTML += '<div class="error-message">Error loading video. Please check the source file.</div>';
+});
